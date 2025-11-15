@@ -1,38 +1,45 @@
-# Scalable ML Pipeline for Hourly Bike Demand Forecasting
+# Hourly Bike Demand Forecasting: A Scalable ML Pipeline
 
-Predicts **next-hour bike rentals** using time, weather, and engineered features from the **UCI Bike Sharing Dataset** (Washington, DC, 2011–2012).
+Predicts **next-hour bike rentals** using the UCI Bike Sharing Dataset (Washington, DC, 2011–2012). Demonstrates **end-to-end ML research**: data engineering, time-aware modeling, experiment tracking, and real-time inference.
 
-> **Research-ready**: clean code, MLflow tracking, time-aware split, FastAPI deployment.
+> **Key Insight**: Feature engineering (rush-hour flags, temp-humidity interaction) + XGBoost reduces RMSE by **13%** vs Random Forest.
 
 ---
 
-## Research Questions & Answers
+## Research Questions & Findings
 
-| Question | Answer |
+| Question | Finding |
 |--------|--------|
-| **What drives demand?** | Peaks at **8–9 AM** and **5–7 PM** on weekdays. `hour`, `workingday`, and `temp` are top predictors. |
-| **How does weather affect usage?** | Higher `temp` → ↑ demand. Rain (`weathersit=3`) → ↓ 60% rentals. |
-| **Which model performs best?** | **XGBoost** (RMSE **63.99**) beats Random Forest (73.33). |
-| **Can it run in real time?** | Yes — `POST /predict` returns demand in **<50ms**. |
+| **What drives demand?** | Peaks at **8–9 AM** and **5–7 TAC** on weekdays. `hour`, `workingday`, and `temp` dominate. |
+| **Weather impact?** | `temp` ↑ → demand ↑; `weathersit=3` (rain) → **60% drop**. |
+| **Best model?** | **XGBoost**: RMSE **63.99**, R² **0.849** (vs RF: 73.33, 0.801). |
+| **Real-time prediction?** | FastAPI `/predict` endpoint returns result in **<50ms**. |
 
 ---
 
-## Model Results (Your Run)
+## Model Performance (Time-Aware Test: Last ~30 Days)
 
 | Model         | RMSE  | R²    |
 |---------------|-------|-------|
 | Random Forest | 73.33 | 0.801 |
 | **XGBoost**   | **63.99** | **0.849** |
 
-> **+13% improvement** with XGBoost. Feature engineering (rush-hour flags, temp-humidity interaction) reduced error vs baseline.
+> **+13% accuracy gain** via engineered features and gradient boosting.
 
 ---
 
-## Data & Split
+## Methodology
 
-- **Dataset**: `hour.csv` (17,379 rows)
-- **Train**: 16,661 rows (first ~22 months)
-- **Test**: 718 rows (**last ~30 days**, time-aware split)
-- **Target**: `cnt` (hourly rentals)
-- **Features**: 19 engineered (year, month, hour, temp, hum, windspeed, weathersit, weekday, holiday, workingday, rush flags, temp×hum)
+- **Dataset**: 17,379 hourly records (`cnt` = total rentals)
+- **Train/Test Split**: Time-aware — **last 718 rows (~30 days)** as holdout
+- **Features**: 19 total (year, month, hour, weather, rush-hour flags, `temp×hum`)
+- **Models**: Random Forest, XGBoost
+- **Tracking**: MLflow (metrics, models, runs)
+- **Deployment**: FastAPI with saved XGBoost model
 
+---
+
+## API Usage
+
+```bash
+uvicorn src.app:app --reload
