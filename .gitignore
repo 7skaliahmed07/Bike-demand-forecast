@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.pyc
+venv/
+bdf/
+
+# Data
+data/processed/*
+!data/processed/.gitkeep
+
+# MLflow
+mlruns/
+
+# Jupyter
+.ipynb_checkpoints
+
+# Models
+models/*
+!models/.gitkeep
